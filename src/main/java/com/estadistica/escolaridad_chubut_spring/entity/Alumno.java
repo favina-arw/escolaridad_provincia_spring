@@ -3,11 +3,9 @@ package com.estadistica.escolaridad_chubut_spring.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import com.estadistica.escolaridad_chubut_spring.util.DataFormatters;
 
 @Setter
 @Getter
@@ -44,6 +42,8 @@ public class Alumno {
 
     private Long cueAnexo;
 
+    private List<Error> errores;
+
     @OneToMany(mappedBy = "alumno")
     @JoinTable(
             name = "alumno_escolaridad",
@@ -53,30 +53,7 @@ public class Alumno {
     private List<Escolaridad> escolaridades;
 
 
-    public String agregarEspaciosAlFinal(String cadena, int longitudMaxima) {
-        for (int i = cadena.length(); i < longitudMaxima; i++) {
-            cadena = cadena.concat(" ");
-        }
-        return cadena;
-    }
 
-    public String agregarCerosAdelante(String cadena, int longitudMaxima) {
-        for (int i = cadena.length(); i < longitudMaxima; i++) {
-            cadena = "0" + cadena;
-        }
-        return cadena;
-    }
-
-    public String formatearFecha(Date fechaInput) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        String fecha = formatter.format(fechaInput).replace("/", "-");
-        String pattern = "dd-MM-yyyy";
-
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(pattern);
-        LocalDate date = LocalDate.parse(fecha, formatter2);
-
-        return date.toString().replace("-", "");
-    }
 
     @Override
     public String toString() {
@@ -87,19 +64,19 @@ public class Alumno {
             numeroDocumento.replace(".", "");
         }
 
-        return agregarCerosAdelante(String.valueOf(this.tipoDocumento), 2) +
-                agregarCerosAdelante(numeroDocumento, 8) +
-                agregarEspaciosAlFinal(this.apellidoNombre, 40) +
+        return  DataFormatters.agregarCerosAdelante(String.valueOf(this.tipoDocumento), 2) +
+                DataFormatters.agregarCerosAdelante(numeroDocumento, 8) +
+                DataFormatters.agregarEspaciosAlFinal(this.apellidoNombre, 40) +
                 this.sexo +
-                agregarCerosAdelante(formatearFecha(this.fechaNacimiento), 8) +
-                agregarCerosAdelante(fechaDefuncion, 8) +
-                agregarEspaciosAlFinal(this.calle, 40) +
-                agregarEspaciosAlFinal(this.calleNumero > 0 ? String.valueOf(this.calleNumero): "", 5) +
-                agregarEspaciosAlFinal(this.piso > 0 ? String.valueOf(this.piso): "", 2) +
-                agregarEspaciosAlFinal(this.departamento,4) +
-                agregarCerosAdelante(String.valueOf(this.codigoPostal), 4) +
-                agregarEspaciosAlFinal(this.localidad, 25) +
-                agregarCerosAdelante(String.valueOf(this.codigoProvincia), 2) +
+                DataFormatters.agregarCerosAdelante(DataFormatters.formatearFecha(this.fechaNacimiento), 8) +
+                DataFormatters.agregarCerosAdelante(fechaDefuncion, 8) +
+                DataFormatters.agregarEspaciosAlFinal(this.calle, 40) +
+                DataFormatters.agregarEspaciosAlFinal(this.calleNumero > 0 ? String.valueOf(this.calleNumero): "", 5) +
+                DataFormatters.agregarEspaciosAlFinal(this.piso > 0 ? String.valueOf(this.piso): "", 2) +
+                DataFormatters.agregarEspaciosAlFinal(this.departamento,4) +
+                DataFormatters.agregarCerosAdelante(String.valueOf(this.codigoPostal), 4) +
+                DataFormatters.agregarEspaciosAlFinal(this.localidad, 25) +
+                DataFormatters.agregarCerosAdelante(String.valueOf(this.codigoProvincia), 2) +
                 this.filler;
     }
 }

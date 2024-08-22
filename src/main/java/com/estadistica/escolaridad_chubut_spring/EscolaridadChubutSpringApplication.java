@@ -19,10 +19,12 @@ public class EscolaridadChubutSpringApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
+		/* INICIO LOGICA DE GUARDADO DE ALUMNO */
 		Alumno alumno = new Alumno();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-		alumno.setCueAnexo(123456789);
+		alumno.setCueAnexo(Long.parseLong("123456789"));
 		//Si es = a 29
 		alumno.setTipoDocumento(TipoDocumentoCodigo.DOCUMENTO_UNICO.getCodigo());
 		//Si no, debería ir OTRO, o NO_POSEE
@@ -38,7 +40,7 @@ public class EscolaridadChubutSpringApplication implements CommandLineRunner {
 		alumno.setCodigoPostal(9103);
 		alumno.setLocalidad("Rawson");
 		alumno.setCodigoProvincia(Provincia.CHUBUT.getCodigo());
-
+		/* FIN LOGICA DE GUARDADO DE ALUMNO */
 
 	}
 }
