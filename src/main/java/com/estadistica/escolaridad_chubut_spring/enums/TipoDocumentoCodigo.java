@@ -10,13 +10,30 @@ public enum TipoDocumentoCodigo {
     OTROS(-1, "OTRO"),
     LIBRETA_DE_ENROLAMIENTO(25, "LIBRETA DE ENROLAMIENTO"),
     LIBRETA_CIVICA(26, "LIBRETA CÍVICA"),
-    DOCUMENTO_UNICO(29, "DOCUMENTO UNICO");
+    DOCUMENTO_UNICO(29, "DOCUMENTO UNICO"),
+    DNI(29, "DOCUMENTO UNICO");;
 
     private final int codigo;
     private final String tipo;
 
     public String getCodigoString(){
         return String.valueOf(this.codigo);
+    }
+
+    public static TipoDocumentoCodigo fromCodigo(int codigo){
+        for (TipoDocumentoCodigo tipo : TipoDocumentoCodigo.values()){
+            if (tipo.getCodigo() == codigo)
+                return tipo;
+        }
+        throw new IllegalArgumentException("No se encontró ese código tipo de documento");
+    }
+
+    public static TipoDocumentoCodigo fromTipo(String s){
+        for (TipoDocumentoCodigo tipo : TipoDocumentoCodigo.values()){
+            if (tipo.getTipo().equalsIgnoreCase(s))
+                return tipo;
+        }
+        throw new IllegalArgumentException("No se encontró ese tipo de documento");
     }
 
 }

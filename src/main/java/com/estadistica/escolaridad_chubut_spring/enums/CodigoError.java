@@ -24,4 +24,13 @@ public enum CodigoError {
     private final String descipcion;
     private final String accion = "VERIFICAR DATOS O PRESENTAR DOCUMENTO DE IDENTIDAD EN ANSES";
 
+    public static CodigoError fromCodigo(int codigo){
+        for(CodigoError error : CodigoError.values()){
+            if (error.getCodigo() == codigo){
+                return error;
+            }
+        }
+        throw new IllegalArgumentException("No se encontró error con ese código.");
+    }
+
 }

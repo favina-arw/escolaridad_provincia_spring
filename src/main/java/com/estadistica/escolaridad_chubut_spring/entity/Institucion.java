@@ -20,4 +20,5 @@ public class Institucion {
     private Long id;
     private String nombre;
     private int cueAnexo;
+    private String nivel;
 }

@@ -37,4 +37,20 @@ public enum Provincia {
         return this.codigo < 10? "0"+String.valueOf(this.codigo):String.valueOf(this.codigo);
     }
 
+    public static Provincia fromNombre(String nombre){
+        for (Provincia provincia : Provincia.values()){
+            if(provincia.getNombre().equalsIgnoreCase(nombre))
+                return provincia;
+        }
+        throw new IllegalArgumentException("No se encontró provincia con ese nombre");
+    }
+
+    public static Provincia fromCodigo(int codigo){
+        for (Provincia provincia : Provincia.values()){
+            if(provincia.getCodigo() == codigo)
+                return provincia;
+        }
+        throw new IllegalArgumentException("No se encontró provincia con ese código");
+    }
+
 }

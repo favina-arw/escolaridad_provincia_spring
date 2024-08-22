@@ -20,7 +20,7 @@ public class Alumno {
     private int documento;
     @Column(name = "tipo_documento")
     private int tipoDocumento;
-    private int cuilt;
+    private int cuilt = 0;
     @Column(name = "apellido_nombre")
     private String apellidoNombre;
     private char sexo;
@@ -39,20 +39,29 @@ public class Alumno {
     @Column(name = "codigo_provincia")
     private int codigoProvincia;
     private String filler = "         \r\n";
-
+    @Column(name = "estado_apropiacion")
+    private int estadoAprociacion = -1;
     private Long cueAnexo;
 
+    public String getEstadoApropiacion(){
+        return "";
+    }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "alumno_error",
+            joinColumns = @JoinColumn (name = "FK_ALUMNO", nullable = false),
+            inverseJoinColumns = @JoinColumn (name = "FK_ERROR", nullable = false)
+    )
     private List<Error> errores;
 
-    @OneToMany(mappedBy = "alumno")
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "alumno_escolaridad",
             joinColumns = @JoinColumn (name = "FK_ALUMNO", nullable = false),
             inverseJoinColumns = @JoinColumn (name = "FK_ESCOLARIDAD", nullable = false)
     )
     private List<Escolaridad> escolaridades;
-
-
 
 
     @Override

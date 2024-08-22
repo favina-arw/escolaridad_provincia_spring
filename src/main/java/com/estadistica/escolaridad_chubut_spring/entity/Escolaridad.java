@@ -39,8 +39,8 @@ public class Escolaridad {
     @Column(name = "codigo_dependencia")
     private int codigoDependencia = 90022804;
 
-    @ManyToOne
-    @JoinColumn(name="id_escolaridad")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="alumno_id")
     private Alumno alumno;
 
     @Override
