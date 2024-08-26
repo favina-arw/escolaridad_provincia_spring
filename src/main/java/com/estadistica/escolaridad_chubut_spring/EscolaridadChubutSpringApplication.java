@@ -1,19 +1,27 @@
 package com.estadistica.escolaridad_chubut_spring;
 
 import com.estadistica.escolaridad_chubut_spring.entity.Alumno;
+import com.estadistica.escolaridad_chubut_spring.entity.Institucion;
 import com.estadistica.escolaridad_chubut_spring.enums.Provincia;
 import com.estadistica.escolaridad_chubut_spring.enums.TipoDocumentoCodigo;
 import com.estadistica.escolaridad_chubut_spring.repository.AlumnoRepository;
+import com.estadistica.escolaridad_chubut_spring.repository.EscolaridadRepository;
+import com.estadistica.escolaridad_chubut_spring.repository.InstitucionRepository;
 import com.estadistica.escolaridad_chubut_spring.util.FilesGrabber;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +34,8 @@ import java.util.Scanner;
 public class EscolaridadChubutSpringApplication implements CommandLineRunner {
 
 	private final AlumnoRepository alumnoRepository;
+	private final InstitucionRepository institucionRepository;
+	private final EscolaridadRepository escolaridadRepository;
 
 
 
@@ -68,8 +78,72 @@ public class EscolaridadChubutSpringApplication implements CommandLineRunner {
 						/** ¿APACHE-POI SIMPLE O POIJI?
 						 * IMPLEMENTAR ESTADO DE "NO" O "EN PROCESO" PARA SABER CUALES ALUMNOS ESTÁN EN OPERACION DE APROPIACIÓN Y CUALES NO
 						 * **/
+						try{
+							POIFSFileSystem fs = new POIFSFileSystem(new File(archivo));
+							HSSFWorkbook libro = new HSSFWorkbook(fs.getRoot(),true);
+							Sheet hoja = libro.getSheetAt(0);
 
-						/* GUARDAR ALUMNO EN LA BASE DE DATOS */
+							String[] datosEscuela = hoja.getRow(1).getCell(0).getStringCellValue().split("-");
+							Institucion institucion = new Institucion();
+							institucion.setCueAnexo(Integer.parseInt(StringUtils.deleteWhitespace(datosEscuela[0])));
+							institucion.setNombre(datosEscuela[1]);
+							institucion.setNivel(datosEscuela[2]);
+							institucion.setModalidad(datosEscuela[3]);
+							//Verificar que la institución no exista!
+							institucionRepository.save(institucion);
+
+
+							Alumno alumno = new Alumno();
+							SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+							for (int i = 3; i <= hoja.getLastRowNum() ; i++){
+								Row fila = hoja.getRow(i);
+
+								alumno.setCueAnexo(Long.parseLong(StringUtils.left(hoja.getRow(1).getCell(0).getStringCellValue(), 9)));
+
+								//Celda 0 -> nombre y apellido
+								alumno.setApellidoNombre(fila.getCell(0).getStringCellValue().replace(",", ""));
+
+								//Celda 1 -> Tipo Documento
+								if (StringUtils.left(fila.getCell(1).getStringCellValue(),3) == "DNI" ||
+										StringUtils.left(fila.getCell(1).getStringCellValue(),3).equals("DNI")){
+									alumno.setTipoDocumento(TipoDocumentoCodigo.fromCodigo(29).getCodigo());
+								}else if(fila.getCell(1).getStringCellValue() == "No posee" ||
+										fila.getCell(1).getStringCellValue().equals("No posee")){
+									alumno.setTipoDocumento(TipoDocumentoCodigo.NO_POSEE.getCodigo());
+								}else{
+									alumno.setTipoDocumento(TipoDocumentoCodigo.OTROS.getCodigo());
+								}
+
+								//Celda 1 -> Numero Documento
+								alumno.setDocumento(Integer.parseInt(StringUtils.right(fila.getCell(1).getStringCellValue(), 8)));
+
+								//Celda 2 -> Fecha nacimiento
+								Date fecha = formatter.parse(fila.getCell(2).getStringCellValue());
+								alumno.setFechaNacimiento(fecha);
+
+								//Celda 3 -> Sexo
+								alumno.setSexo(fila.getCell(3).getStringCellValue().toUpperCase().charAt(0));
+
+								//Se rellena el resto de datos del alumno
+								alumno.setCodigoProvincia(Provincia.CHUBUT.getCodigo());
+								alumno.setCalle("");
+								alumno.setCalleNumero(0);
+								alumno.setPiso(0);
+								alumno.setDepartamento("");
+								alumno.setCodigoPostal(0);
+								alumno.setLocalidad("");
+
+								alumnoRepository.save(alumno);
+						}
+
+						}catch (IOException e){
+							System.out.println("Problemas con apertura de archivos");
+							e.printStackTrace();
+						} catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                        /* GUARDAR ALUMNO EN LA BASE DE DATOS */
 					});
 					break;
 				case 2:
@@ -111,10 +185,7 @@ public class EscolaridadChubutSpringApplication implements CommandLineRunner {
 
 		/* INICIO LOGICA DE ARMADO DE ALUMNO */
 		/*
-		Alumno alumno = new Alumno();
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-		alumno.setCueAnexo(Long.parseLong("123456789"));
 		//Si es = a 29
 		alumno.setTipoDocumento(TipoDocumentoCodigo.DOCUMENTO_UNICO.getCodigo());
 		//Si no, debería ir OTRO, o NO_POSEE

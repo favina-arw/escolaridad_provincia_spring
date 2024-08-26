@@ -11,7 +11,7 @@ public enum TipoDocumentoCodigo {
     LIBRETA_DE_ENROLAMIENTO(25, "LIBRETA DE ENROLAMIENTO"),
     LIBRETA_CIVICA(26, "LIBRETA CÍVICA"),
     DOCUMENTO_UNICO(29, "DOCUMENTO UNICO"),
-    DNI(29, "DOCUMENTO UNICO");;
+    DNI(29, "DNI");;
 
     private final int codigo;
     private final String tipo;

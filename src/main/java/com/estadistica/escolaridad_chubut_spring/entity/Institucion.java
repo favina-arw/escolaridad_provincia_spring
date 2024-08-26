@@ -21,4 +21,5 @@ public class Institucion {
     private String nombre;
     private int cueAnexo;
     private String nivel;
+    private String modalidad;
 }
